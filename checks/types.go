@@ -23,7 +23,36 @@ type Check struct {
 	GetLog func() (string, error)
 }
 
-var Checks = map[string]func() (Check, error){
-	"aktualizr-lite": AkliteCheck,
-	"docker":         func() (Check, error) { return DoSystemDCheck("docker") },
+type CheckFunc func() (Check, error)
+
+type entry struct {
+	Name string
+	Func CheckFunc
+}
+
+var entries = []entry{}
+
+func Iterate(cb func(name string, check CheckFunc) error) error {
+	for _, entry := range entries {
+		if e := cb(entry.Name, entry.Func); e != nil {
+			return e
+		}
+	}
+	return nil
+}
+
+func GetCheck(name string) (CheckFunc, bool) {
+	for _, entry := range entries {
+		if entry.Name == name {
+			return entry.Func, true
+		}
+	}
+	return nil, false
+}
+
+func init() {
+	dockerFunc := func() (Check, error) { return DoSystemDCheck("docker") }
+	entries = append(entries, entry{"aktualizr-lite", AkliteCheck})
+	entries = append(entries, entry{"docker", dockerFunc})
+	// entries = append(entries, entry{"azure-iot-edge", func()(Check, error){return ComposeCheck("azure-iot-edge")})
 }

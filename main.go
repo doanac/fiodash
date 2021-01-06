@@ -14,20 +14,21 @@ import (
 
 func runChecks() error {
 	w := tabwriter.NewWriter(os.Stdout, 0, 0, 2, ' ', 0)
-	for name, checkFunc := range checks.Checks {
+	e := checks.Iterate(func(name string, checkFunc checks.CheckFunc) error {
 		ss, err := checkFunc()
 		if err != nil {
 			fmt.Fprintf(w, "%s\tERROR\t%s\n", name, err)
 		} else {
 			fmt.Fprintf(w, "%s\t%s\t%s\n", name, ss.Status.Val, ss.Status.Msg)
 		}
-	}
+		return nil
+	})
 	w.Flush()
-	return nil
+	return e
 }
 
 func checkDetails(name string) error {
-	check, ok := checks.Checks[name]
+	check, ok := checks.GetCheck(name)
 	if !ok {
 		return fmt.Errorf("ERROR: No such check: %s", name)
 	}
