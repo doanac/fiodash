@@ -1,5 +1,9 @@
 package checks
 
+import (
+	"io/ioutil"
+)
+
 type StatusVal string
 
 const (
@@ -54,5 +58,14 @@ func init() {
 	dockerFunc := func() (Check, error) { return DoSystemDCheck("docker") }
 	entries = append(entries, entry{"aktualizr-lite", AkliteCheck})
 	entries = append(entries, entry{"docker", dockerFunc})
-	// entries = append(entries, entry{"azure-iot-edge", func()(Check, error){return ComposeCheck("azure-iot-edge")})
+	files, err := ioutil.ReadDir("/var/sota/compose")
+	if err != nil {
+		return
+	}
+	for _, f := range files {
+		if f.IsDir() {
+			check := func() (Check, error) { return ComposeCheck(f.Name()) }
+			entries = append(entries, entry{f.Name(), check})
+		}
+	}
 }
