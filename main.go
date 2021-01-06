@@ -10,6 +10,7 @@ import (
 
 	"github.com/foundriesio/fiodash/checks"
 	"github.com/foundriesio/fiodash/internal"
+	"github.com/foundriesio/fiodash/server"
 )
 
 func runChecks() error {
@@ -46,6 +47,7 @@ func checkDetails(name string) error {
 
 func main() {
 	var checkName string
+	var port int
 
 	app := &cli.App{
 		Name:  "fiodash",
@@ -75,6 +77,21 @@ func main() {
 					} else {
 						return checkDetails(checkName)
 					}
+				},
+			},
+			{
+				Name: "serve",
+				Flags: []cli.Flag{
+					&cli.IntFlag{
+						Name:        "port",
+						Aliases:     []string{"p"},
+						Usage:       "Port to use",
+						Value:       80,
+						Destination: &port,
+					},
+				},
+				Action: func(c *cli.Context) error {
+					return server.Serve(port)
 				},
 			},
 		},
