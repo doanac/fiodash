@@ -18,6 +18,7 @@ setup(
     version="0.1.0",
     packages=find_packages(),
     install_requires=install_requires,
+    entry_points={"console_scripts": ["fiodash = fiodash.main:main",],},
     python_requires=">=3.7",
     classifiers=[
         "Development Status :: 5 - Production/Stable",

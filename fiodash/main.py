@@ -147,7 +147,7 @@ def _get_parser():
     return parser
 
 
-if __name__ == "__main__":
+def main():
     parser = _get_parser()
     args = parser.parse_args()
 
@@ -160,3 +160,7 @@ if __name__ == "__main__":
     else:
         parser.print_help(sys.stderr)
         sys.exit(1)
+
+
+if __name__ == "__main__":
+    main()
