@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import logging
+import sys
 
 from bottle import error, redirect, request, route, run, template
 from requests import HTTPError
@@ -66,15 +67,23 @@ def update_target():
     redirect("/")
 
 
+def webapp(args):
+    run(host=args.host, port=args.port, debug=args.debug, reloader=args.debug)
+
+
 def _get_parser():
     parser = ArgumentParser(description="fiodash web app")
-    parser.add_argument(
+    sub = parser.add_subparsers(help="sub-command help")
+
+    p = sub.add_parser("serve", help="Run as a web app")
+    p.set_defaults(func=webapp)
+    p.add_argument(
         "--host", default="0.0.0.0", help="Host to bind to. Default=%(default)s",
     )
-    parser.add_argument(
+    p.add_argument(
         "--port", type=int, default=8080, help="Port to bind to. Default=%(default)s",
     )
-    parser.add_argument(
+    p.add_argument(
         "--debug", action="store_true", help="Run in debug mode",
     )
     return parser
@@ -86,4 +95,10 @@ if __name__ == "__main__":
 
     client.refresh_config()
     client.send_telemetry()
-    run(host=args.host, port=args.port, debug=args.debug)
+
+    args = parser.parse_args()
+    if getattr(args, "func", None):
+        args.func(args)
+    else:
+        parser.print_help(sys.stderr)
+        sys.exit(1)
