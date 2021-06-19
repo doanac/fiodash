@@ -71,6 +71,48 @@ def webapp(args):
     run(host=args.host, port=args.port, debug=args.debug, reloader=args.debug)
 
 
+def list_targets(args):
+    for t in client.targets():
+        print("# Target version", t.version)
+        print("\tname:      ", t.name)
+        print("\tostree sha:", t.sha256)
+        print("\tapps:")
+        for name, app in t.apps.items():
+            print("\t\t", name, "\t", app.uri)
+        print()
+
+
+def install_target(args):
+    current = client.get_current()
+    targets = client.targets()
+    tgt = targets[-1]
+    if args.target_version:
+        for t in targets:
+            if t.version == args.target_version:
+                tgt = t
+                break
+        else:
+            sys.exit("Target version not found")
+
+    log.info("Downloading", tgt.name)
+    correlation_id = tgt.generate_correlation_id()
+    reason = f"Upgrading from {current.name} to {tgt.name}"
+    client.download(tgt.name, correlation_id, reason)
+
+    log.info("Installing", tgt)
+    client.install(tgt.name, correlation_id)
+
+
+def status(args):
+    t = client.get_current()
+    print("# Target version", t.version)
+    print("\tname:      ", t.name)
+    print("\tostree sha:", t.sha256)
+    print("\tapps:")
+    for name, app in t.apps.items():
+        print("\t\t", name, "\t", app.uri)
+
+
 def _get_parser():
     parser = ArgumentParser(description="fiodash web app")
     sub = parser.add_subparsers(help="sub-command help")
@@ -86,6 +128,22 @@ def _get_parser():
     p.add_argument(
         "--debug", action="store_true", help="Run in debug mode",
     )
+
+    p = sub.add_parser("list", help="List available targets")
+    p.set_defaults(func=list_targets)
+
+    p = sub.add_parser("install", help="Install target")
+    p.set_defaults(func=install_target)
+    p.add_argument(
+        "--target-version",
+        "-t",
+        type=int,
+        help="Target version. Default is latest Target",
+    )
+
+    p = sub.add_parser("status", help="Show current status")
+    p.set_defaults(func=status)
+
     return parser
 
 
