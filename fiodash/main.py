@@ -103,6 +103,10 @@ def install_target(args):
     client.install(tgt.name, correlation_id)
 
 
+def set_apps(args):
+    client.set_apps(args.app)
+
+
 def status(args):
     t = client.get_current()
     configured_apps = client.configured_apps
@@ -133,6 +137,10 @@ def _get_parser():
 
     p = sub.add_parser("list", help="List available targets")
     p.set_defaults(func=list_targets)
+
+    p = sub.add_parser("set-apps", help="Set apps to run on target")
+    p.set_defaults(func=set_apps)
+    p.add_argument("app", nargs="*")
 
     p = sub.add_parser("install", help="Install target")
     p.set_defaults(func=install_target)
