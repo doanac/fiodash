@@ -105,12 +105,14 @@ def install_target(args):
 
 def status(args):
     t = client.get_current()
+    configured_apps = client.configured_apps
     print("# Target version", t.version)
     print("\tname:      ", t.name)
     print("\tostree sha:", t.sha256)
-    print("\tapps:")
+    print("\tapps: (* = running)")
     for name, app in t.apps.items():
-        print("\t\t", name, "\t", app.uri)
+        val = "*" if name in configured_apps else " "
+        print("\t\t", val, name, "\t", app.uri)
 
 
 def _get_parser():
