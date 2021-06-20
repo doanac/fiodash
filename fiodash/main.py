@@ -94,12 +94,12 @@ def install_target(args):
         else:
             sys.exit("Target version not found")
 
-    log.info("Downloading", tgt.name)
+    log.info("Downloading %s", tgt.name)
     correlation_id = tgt.generate_correlation_id()
     reason = f"Upgrading from {current.name} to {tgt.name}"
     client.download(tgt.name, correlation_id, reason)
 
-    log.info("Installing", tgt)
+    log.info("Installing %s", tgt)
     client.install(tgt.name, correlation_id)
 
 
