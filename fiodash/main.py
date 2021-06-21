@@ -1,8 +1,10 @@
 from argparse import ArgumentParser
 import logging
 import sys
+from threading import Thread
+from time import sleep
 
-from bottle import error, redirect, request, route, run, template
+from bottle import error, redirect, request, response, route, run, template
 from requests import HTTPError
 
 from fiodash.aklite import AkliteClient
@@ -63,8 +65,15 @@ def update_target():
         client.download(latest.name, correlation_id, reason)
 
         log.info("Installing target")
-        client.install(latest.name, correlation_id)
-    redirect("/")
+        if client.install(latest.name, correlation_id):
+            response.status = 202
+
+            def sleep_reboot():
+                sleep(2)
+                client.reboot()
+
+            Thread(target=sleep_reboot).start()
+    return ""
 
 
 def webapp(args):
@@ -100,7 +109,8 @@ def install_target(args):
     client.download(tgt.name, correlation_id, reason)
 
     log.info("Installing %s", tgt)
-    client.install(tgt.name, correlation_id)
+    if client.install(tgt.name, correlation_id):
+        client.reboot()
 
 
 def set_apps(args):

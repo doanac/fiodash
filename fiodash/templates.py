@@ -86,7 +86,11 @@ function handleOta(errorPanel) {
       if (!response.ok) {
         throw new Error(response.statusText);
       }
-      location.reload();
+      if (response.status == 202) {
+        alert("REBOOTING DEVICE!!!!")
+      } else {
+        location.reload();
+      }
     })
     .catch((error) => {
       console.error('Error:', error);

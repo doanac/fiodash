@@ -82,7 +82,7 @@ class AkliteClient:
         r.raise_for_status()
         return Target.from_dict(r.json())
 
-    def install(self, target: str, correlation_id: str):
+    def install(self, target: str, correlation_id: str) -> bool:
         data = {
             "target-name": target,
             "correlation-id": correlation_id,
@@ -91,8 +91,12 @@ class AkliteClient:
         r.raise_for_status()
         if r.json().get("needs-reboot"):
             log.warning("Target installation requires reboot. Rebooting now!")
-            reboot_cmd = self._config["bootloader"]["reboot_command"]
-            subprocess.check_call(shlex.split(reboot_cmd))
+            return True
+        return False
+
+    def reboot(self):
+        reboot_cmd = self._config["bootloader"]["reboot_command"]
+        subprocess.check_call(shlex.split(reboot_cmd))
 
     def send_telemetry(self):
         r = self.requests.put("http+unix://localhost/telemetry")
