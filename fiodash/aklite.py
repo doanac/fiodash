@@ -63,6 +63,8 @@ class AkliteClient:
     def configured_apps(self) -> List[str]:
         # Weird thing with how propertytree/json/toml does stuff:
         apps = self._config["pacman"].get("compose_apps") or ""
+        if not apps:
+            return []
         if apps[0] == '"':
             # path is quoted
             apps = apps[1:-1]
