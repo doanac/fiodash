@@ -112,7 +112,10 @@ document.addEventListener("DOMContentLoaded", () => {
   <section class="section">
     <div class="container">
       <h1 class="title">FIO Dashboard</h1>
-
+      <p class="subtitle">
+        Device Name: {{name}}<br/>
+        Device UUID: {{uuid}}
+      </p>
       <table class="table">
        <tbody>
          <tr>

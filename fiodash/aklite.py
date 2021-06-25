@@ -4,7 +4,7 @@ import os
 import shlex
 import subprocess
 from time import sleep
-from typing import Dict, List, NamedTuple, Optional
+from typing import Dict, List, NamedTuple, Optional, Tuple
 from uuid import uuid4
 
 from docker.transport.unixconn import UnixHTTPAdapter
@@ -49,6 +49,11 @@ class AkliteClient:
     @property
     def polling_interval(self) -> int:
         return int(self._config["uptane"]["polling_sec"])
+
+    def get_uuid_and_name(self) -> Tuple[str, str]:
+        r = self.requests.get("http+unix://localhost/config/name")
+        r.raise_for_status()
+        return r.json()["uuid"], r.json()["name"]
 
     @property
     def sota_dir(self) -> str:

@@ -29,6 +29,7 @@ def error500(error):
 
 @route("/")
 def index():
+    uuid, name = client.get_uuid_and_name()
     current = client.get_current()
     latest = client.targets()[-1]
     update_available = None
@@ -40,6 +41,8 @@ def index():
         apps.append({"name": app, "enabled": app in configured_apps})
     return template(
         INDEX_TPL,
+        name=name,
+        uuid=uuid,
         current_target=current,
         latest=latest,
         apps=apps,
@@ -126,6 +129,10 @@ def set_apps(args):
 
 
 def status(args):
+    uuid, name = client.get_uuid_and_name()
+    print("# Device UUID:", uuid)
+    print("# Device Name:", name)
+
     t = client.get_current()
     configured_apps = client.configured_apps
     print("# Target version", t.version)
