@@ -1,5 +1,6 @@
 from argparse import ArgumentParser
 import logging
+import os
 import sys
 from threading import Thread
 from time import sleep
@@ -15,6 +16,7 @@ log = logging.getLogger()
 logging.getLogger("requests").setLevel(logging.WARNING)
 
 client = AkliteClient()
+SINGLE_APP = os.environ.get("FIODASH_SINGLE_APP")
 
 
 @error(500)
@@ -36,7 +38,13 @@ def index():
     apps = []
     for app in current.apps:
         apps.append({"name": app, "enabled": app in configured_apps})
-    return template(INDEX_TPL, current_target=current, latest=latest, apps=apps)
+    return template(
+        INDEX_TPL,
+        current_target=current,
+        latest=latest,
+        apps=apps,
+        single_app=SINGLE_APP,
+    )
 
 
 @route("/update-apps", method="POST")

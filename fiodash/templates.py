@@ -21,8 +21,8 @@ function handleApps(errorPanel) {
     errorPanel.style.display = "none";
     console.log("Enabling apps");
     for (var pair of formData.entries()) {
-      apps.push(pair[0]);
-      console.log(" " + pair[0]);
+      apps.push(pair[1]);
+      console.log(" " + pair[1]);
     }
 
     // disable while we do this:
@@ -132,8 +132,12 @@ document.addEventListener("DOMContentLoaded", () => {
              <form id="update-apps-form">
              % for app in apps:
                <div>
-                 <input type="checkbox" name="{{app['name']}}" {{"checked" if app['enabled'] else ""}}>
-                 <label for="{{app['name']}}">{{app['name']}}</label>
+               % if single_app:
+                 <input type="radio" name="app" value="{{app['name']}}" {{"checked" if app['enabled'] else ""}}>
+               % else:
+                 <input type="checkbox" name="app" value="{{app['name']}}" {{"checked" if app['enabled'] else ""}}>
+               % end
+                 <label>{{app['name']}}</label>
                </div>
              % end
              <button id="update-apps-btn" type="submit">Change apps</button>
